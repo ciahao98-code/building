@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>既有建築空調現勘</title>
+<script src="/workflow.js" defer></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef4f4;color:#162f33;font:16px/1.55 system-ui,sans-serif}header{background:#154048;color:white;padding:30px max(20px,calc((100% - 1050px)/2))}h1,h2,h3,p{margin:0 0 12px}h1{font-size:clamp(24px,5vw,37px)}h2{font-size:22px}h3{font-size:17px;margin:0}main{max-width:1090px;margin:auto;padding:20px}section.panel,.card{background:white;border:1px solid #cbdadc;border-radius:12px;padding:18px;margin-bottom:16px}.card{background:#f7fafb}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.card .row{justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.wide{grid-column:1/-1}label{display:block;font-weight:600;font-size:14px}input:not([type=checkbox]),select,textarea{display:block;width:100%;margin-top:4px;border:1px solid #9cb5b9;border-radius:6px;padding:8px;font:inherit;background:white;color:inherit}textarea{min-height:65px}button,.button{border:1px solid #19535c;border-radius:7px;padding:8px 15px;background:#19535c;color:white;font:inherit;cursor:pointer}.light,.button.light{background:white;color:#19535c}button:disabled{opacity:.55;cursor:wait}output{display:block;color:#15545d;font-weight:650;margin-top:10px}#preview{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}figure{margin:0;width:132px}figure img{width:132px;height:84px;object-fit:contain;background:#edf4f5;border-radius:5px}figcaption{overflow-wrap:anywhere;font-size:12px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;color:#37535a}small{color:#405c61}#load{font-size:13px}
+</style>
+</head>
+<body data-token="__LOCAL_TOKEN__">
+<header><h1>既有建築空調現勘</h1><p>照片辨識、設備分類與散熱查驗</p></header>
+<main>
+<section class="panel">
+<h2>案件資料</h2>
+<div class="grid">
+<label>建物或案件名稱<input id="project"></label>
+<label>樓層數<input id="floors" type="number" min="1" step="1"></label>
+<label>現勘日期<input type="date" id="date"></label>
+<label>匯入案件 JSON<input type="file" id="load" accept=".json,application/json"></label>
+</div>
+</section>
+<section class="panel">
+<h2>上傳照片</h2>
+<p>可選設備全景、銘牌、高壓表、冷卻水出水溫度或設備規格表照片。多張照片可分批辨識。</p>
+<label>照片檔案<input id="photos" type="file" multiple accept="image/jpeg,image/png,image/webp"></label>
+<div id="preview"></div>
+<div class="row"><button id="scan">辨識設備資料</button><small>按下辨識會將所選照片傳送至 OpenAI API。</small></div>
+<p id="status" role="status"></p>
+<details><summary>照片編號及辨識備註</summary><pre id="sources"></pre><pre id="notes"></pre></details>
+</section>
+<section class="panel">
+<h2>設備清冊與散熱查驗</h2>
+<p>逐筆核對台數、額定冷房能力、規格及系統歸屬。同一設備的多角度照片請合併為一筆。水冷主機冷凝溫度須依銘牌冷媒種類核對高壓表對應刻度。</p>
+<div class="row"><button id="add" class="light">手動新增設備</button></div>
+<div id="devices"></div>
+<label>現勘補充或散熱不佳說明<textarea id="observations"></textarea></label>
+</section>
+<section class="panel">
+<h2>EAC 評估路徑</h2>
+<label><input type="checkbox" id="complete"> 已確認全棟評估範圍的設備清冊及主機台數</label>
+<output id="route" aria-live="polite"></output>
+</section>
+<section class="panel">
+<h2>儲存案件</h2>
+<p>案件檔包含設備清冊、查驗結果與照片檔名。原始照片請與案件檔一起保留。</p>
+<div class="row"><button id="saveDraft">儲存案件</button><button id="loadDraft" class="light">載入上次儲存</button></div>
+<small>個人網站保留一份草稿。再次儲存會更新同一份草稿。</small>
+<p id="draftStatus" role="status"></p>
+<div class="row"><button id="report">下載 Excel 填報稿</button><button id="save" class="light">下載案件 JSON</button></div>
+<p id="exportStatus" role="status"></p>
+<a id="reportDownload" hidden>點此下載已產生的 Excel 檔</a>
+</section>
+</main>
+<script>
+if (location.protocol === "file:") {
+  document.getElementById("report").disabled = true;
+  document.getElementById("exportStatus").textContent =
+    "請使用部署完成後提供的 HTTPS 網址。";
+}
+</script>
+</body>
+</html>
